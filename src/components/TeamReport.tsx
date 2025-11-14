@@ -51,7 +51,23 @@ const formatLegendLabel = (value: string | number) => {
 };
 
 const legendWrapperStyle: React.CSSProperties = {
+  fontSize: '10px'
+};
+
+const axisTickStyle: React.CSSProperties = {
+  fontSize: '10px'
+};
+
+const tooltipContentStyle: React.CSSProperties = {
   fontSize: '12px'
+};
+
+const tooltipItemStyle: React.CSSProperties = {
+  fontSize: '12px'
+};
+
+const tooltipLabelStyle: React.CSSProperties = {
+  fontSize: '11px'
 };
 
 const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
@@ -138,7 +154,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                       <Cell key={entry.email} fill={getColor(index)} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => value.toFixed(1)} />
+                  <Tooltip
+                    formatter={(value: number) => value.toFixed(1)}
+                    contentStyle={tooltipContentStyle}
+                    itemStyle={tooltipItemStyle}
+                    labelStyle={tooltipLabelStyle}
+                  />
                   <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 </PieChart>
               </ResponsiveContainer>
@@ -154,7 +175,11 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                       <Cell key={entry.email} fill={getColor(index)} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={tooltipContentStyle}
+                    itemStyle={tooltipItemStyle}
+                    labelStyle={tooltipLabelStyle}
+                  />
                   <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 </PieChart>
               </ResponsiveContainer>
@@ -170,9 +195,13 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
             <ResponsiveContainer>
               <BarChart data={storySeries}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
+                <XAxis dataKey="month" tick={axisTickStyle} />
+                <YAxis allowDecimals={false} tick={axisTickStyle} />
+                <Tooltip
+                  contentStyle={tooltipContentStyle}
+                  itemStyle={tooltipItemStyle}
+                  labelStyle={tooltipLabelStyle}
+                />
                 <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 {developerKeys.map((key, index) => (
                   <Bar key={key} dataKey={key} stackId="story" fill={getColor(index)} />
@@ -185,9 +214,13 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
             <ResponsiveContainer>
               <BarChart data={bugSeries}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
+                <XAxis dataKey="month" tick={axisTickStyle} />
+                <YAxis allowDecimals={false} tick={axisTickStyle} />
+                <Tooltip
+                  contentStyle={tooltipContentStyle}
+                  itemStyle={tooltipItemStyle}
+                  labelStyle={tooltipLabelStyle}
+                />
                 <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 {developerKeys.map((key, index) => (
                   <Bar key={key} dataKey={key} stackId="bug" fill={getColor(index)} />
@@ -248,7 +281,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                               <Cell key={entry.email} fill={getColor(index)} />
                             ))}
                           </Pie>
-                          <Tooltip formatter={(value: number) => value.toFixed(1)} />
+                          <Tooltip
+                            formatter={(value: number) => value.toFixed(1)}
+                            contentStyle={tooltipContentStyle}
+                            itemStyle={tooltipItemStyle}
+                            labelStyle={tooltipLabelStyle}
+                          />
                           <Legend
                             formatter={(value) => formatLegendLabel(value)}
                             wrapperStyle={legendWrapperStyle}
@@ -265,7 +303,11 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                               <Cell key={entry.email} fill={getColor(index)} />
                             ))}
                           </Pie>
-                          <Tooltip />
+                          <Tooltip
+                            contentStyle={tooltipContentStyle}
+                            itemStyle={tooltipItemStyle}
+                            labelStyle={tooltipLabelStyle}
+                          />
                           <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                         </PieChart>
                       </ResponsiveContainer>
