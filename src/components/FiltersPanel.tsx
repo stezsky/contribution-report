@@ -17,6 +17,8 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   selectedTeams,
   onTeamsChange
 }) => {
+  const teamList = Array.isArray(teams) ? teams : [];
+
   const handleTeamToggle = (team: string) => {
     if (selectedTeams.includes(team)) {
       onTeamsChange(selectedTeams.filter((item) => item !== team));
@@ -26,7 +28,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   };
 
   const handleSelectAll = () => {
-    onTeamsChange([...teams]);
+    onTeamsChange([...teamList]);
   };
 
   const handleClearSelection = () => {
@@ -80,7 +82,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
               type="button"
               onClick={handleSelectAll}
               className="text-accent hover:underline"
-              disabled={teams.length === 0}
+              disabled={teamList.length === 0}
             >
               Select all
             </button>
@@ -90,7 +92,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {teams.map((team) => {
+          {teamList.map((team) => {
             const isSelected = selectedTeams.includes(team);
             return (
               <label
@@ -109,7 +111,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
               </label>
             );
           })}
-          {teams.length === 0 && <p className="text-sm text-slate-500">No teams found.</p>}
+          {teamList.length === 0 && <p className="text-sm text-slate-500">No teams found.</p>}
         </div>
       </div>
     </section>
