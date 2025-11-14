@@ -41,6 +41,19 @@ const palette = [
 
 const getColor = (index: number) => palette[index % palette.length];
 
+const formatLegendLabel = (value: string | number) => {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  const [localPart] = value.split('@');
+  return localPart;
+};
+
+const legendWrapperStyle: React.CSSProperties = {
+  fontSize: '12px'
+};
+
 const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
   const developerTotals = useMemo(() => aggregateByDeveloper(contributions), [contributions]);
   const monthlyTotals = useMemo(() => aggregateByMonth(contributions), [contributions]);
@@ -126,7 +139,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                     ))}
                   </Pie>
                   <Tooltip formatter={(value: number) => value.toFixed(1)} />
-                  <Legend />
+                  <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -142,7 +155,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                     ))}
                   </Pie>
                   <Tooltip />
-                  <Legend />
+                  <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -160,7 +173,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                 <XAxis dataKey="month" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Legend />
+                <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 {developerKeys.map((key, index) => (
                   <Bar key={key} dataKey={key} stackId="story" fill={getColor(index)} />
                 ))}
@@ -175,7 +188,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                 <XAxis dataKey="month" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Legend />
+                <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                 {developerKeys.map((key, index) => (
                   <Bar key={key} dataKey={key} stackId="bug" fill={getColor(index)} />
                 ))}
@@ -236,7 +249,10 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                             ))}
                           </Pie>
                           <Tooltip formatter={(value: number) => value.toFixed(1)} />
-                          <Legend />
+                          <Legend
+                            formatter={(value) => formatLegendLabel(value)}
+                            wrapperStyle={legendWrapperStyle}
+                          />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
@@ -250,7 +266,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                             ))}
                           </Pie>
                           <Tooltip />
-                          <Legend />
+                          <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
