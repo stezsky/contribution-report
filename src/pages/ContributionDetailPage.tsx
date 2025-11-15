@@ -27,18 +27,18 @@ const formatDate = (value?: string) => {
   return date.toLocaleString();
 };
 
-const formatChange = (added?: number, deleted?: number) => {
+const renderChange = (added?: number, deleted?: number) => {
   const safeAdded = added ?? 0;
   const safeDeleted = deleted ?? 0;
-  return `+${safeAdded} -${safeDeleted}`;
-};
+  const addedClass = safeAdded === 0 ? 'text-slate-500' : 'text-emerald-600';
+  const deletedClass = safeDeleted === 0 ? 'text-slate-500' : 'text-rose-600';
 
-const shortenCommitId = (commitId: string) => {
-  if (!commitId) {
-    return '-';
-  }
-
-  return commitId.length > 12 ? commitId.slice(0, 12) : commitId;
+  return (
+    <div className="flex items-center gap-2 font-medium">
+      <span className={addedClass}>+{safeAdded}</span>
+      <span className={deletedClass}>-{safeDeleted}</span>
+    </div>
+  );
 };
 
 const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, developer, onBack }) => {
@@ -203,7 +203,6 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                   <tr className="text-left text-slate-500 uppercase text-[0.65rem] tracking-wide">
                     <th className="py-2 pr-4">Repository</th>
                     <th className="py-2 pr-4">Jira task</th>
-                    <th className="py-2 pr-4">Commit</th>
                     <th className="py-2 pr-4">Message</th>
                     <th className="py-2 pr-4">Date</th>
                     <th className="py-2 pr-4">Source</th>
@@ -214,7 +213,7 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                 <tbody>
                   {detail.commitContributions.length === 0 && (
                     <tr>
-                      <td className="py-4 text-center text-slate-500" colSpan={8}>
+                      <td className="py-4 text-center text-slate-500" colSpan={7}>
                         No commits recorded for this month.
                       </td>
                     </tr>
@@ -269,25 +268,28 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                             '-'
                           )}
                         </td>
-                        <td className="py-2 pr-4 font-medium text-slate-700 whitespace-nowrap">
-                          {commitUrl ? (
-                            <a
-                              href={commitUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-accent hover:text-accent/80"
-                            >
-                              {shortenCommitId(commit.commitId)}
-                            </a>
+                        <td className="py-2 pr-4 max-w-md whitespace-pre-line">
+                          {commit.commitMessage ? (
+                            commitUrl ? (
+                              <a
+                                href={commitUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent hover:text-accent/80"
+                              >
+                                {commit.commitMessage}
+                              </a>
+                            ) : (
+                              commit.commitMessage
+                            )
                           ) : (
-                            shortenCommitId(commit.commitId)
+                            '-'
                           )}
                         </td>
-                        <td className="py-2 pr-4 max-w-md whitespace-pre-line">{commit.commitMessage}</td>
                         <td className="py-2 pr-4 whitespace-nowrap">{formatDate(commit.commitDate)}</td>
-                        <td className="py-2 pr-4">{formatChange(commit.srcAdded, commit.srcDeleted)}</td>
-                        <td className="py-2 pr-4">{formatChange(commit.testAdded, commit.testDeleted)}</td>
-                        <td className="py-2 pr-4">{formatChange(commit.othersAdded, commit.othersDeleted)}</td>
+                        <td className="py-2 pr-4">{renderChange(commit.srcAdded, commit.srcDeleted)}</td>
+                        <td className="py-2 pr-4">{renderChange(commit.testAdded, commit.testDeleted)}</td>
+                        <td className="py-2 pr-4">{renderChange(commit.othersAdded, commit.othersDeleted)}</td>
                       </tr>
                     );
                   })}
