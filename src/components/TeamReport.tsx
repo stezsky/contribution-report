@@ -131,8 +131,8 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
 
   const hasStoryShareData = hasDeveloperMetric(developerTotals, 'plannedStoryPoints');
   const hasBugShareData = hasDeveloperMetric(developerTotals, 'bugCount');
-  const hasStoryStackedData = hasStackedSeriesValues(storySeries, developerKeys);
-  const hasBugStackedData = hasStackedSeriesValues(bugSeries, developerKeys);
+  const hasStoryMonthlyDeveloperData = hasStackedSeriesValues(storySeries, developerKeys);
+  const hasBugMonthlyDeveloperData = hasStackedSeriesValues(bugSeries, developerKeys);
 
   return (
     <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-8">
@@ -251,11 +251,70 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
         <div className="h-80 min-w-0">
           <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
             <span className="text-primary">
+              <SparkIcon className="h-5 w-5" />
+            </span>
+            Story Points per developer
+          </h3>
+          {hasStoryMonthlyDeveloperData ? (
+            <ResponsiveContainer>
+              <BarChart data={storySeries}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tick={axisTickStyle} />
+                <YAxis tick={axisTickStyle} />
+                <Tooltip
+                  contentStyle={tooltipContentStyle}
+                  itemStyle={tooltipItemStyle}
+                  labelStyle={tooltipLabelStyle}
+                />
+                <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
+                {developerKeys.map((key, index) => (
+                  <Bar key={key} dataKey={key} fill={getColor(index)} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ChartPlaceholder message="No story developer data" />
+          )}
+        </div>
+        <div className="h-80 min-w-0">
+          <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <span className="text-primary">
+              <BugIcon className="h-5 w-5" />
+            </span>
+            Bugs per developer
+          </h3>
+          {hasBugMonthlyDeveloperData ? (
+            <ResponsiveContainer>
+              <BarChart data={bugSeries}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tick={axisTickStyle} />
+                <YAxis allowDecimals={false} tick={axisTickStyle} />
+                <Tooltip
+                  contentStyle={tooltipContentStyle}
+                  itemStyle={tooltipItemStyle}
+                  labelStyle={tooltipLabelStyle}
+                />
+                <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
+                {developerKeys.map((key, index) => (
+                  <Bar key={key} dataKey={key} fill={getColor(index)} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <ChartPlaceholder message="No bug developer data" />
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="h-80 min-w-0">
+          <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <span className="text-primary">
               <ColumnsIcon className="h-5 w-5" />
             </span>
             Story Points per month
           </h3>
-          {hasStoryStackedData ? (
+          {hasStoryMonthlyDeveloperData ? (
             <ResponsiveContainer>
               <BarChart data={storySeries}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -283,7 +342,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
             </span>
             Bugs fixed per month
           </h3>
-          {hasBugStackedData ? (
+          {hasBugMonthlyDeveloperData ? (
             <ResponsiveContainer>
               <BarChart data={bugSeries}>
                 <CartesianGrid strokeDasharray="3 3" />
