@@ -10,6 +10,7 @@ import {
   clearContributions
 } from '../features/contributions/contributionsSlice';
 import { setMonths, setSelectedTeams } from '../features/filters/filtersSlice';
+import { AlertIcon, EmptyStateIcon, InfoIcon, LoadingIcon } from '../components/icons';
 
 const ContributionReportPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -57,32 +58,47 @@ const ContributionReportPage: React.FC = () => {
       />
 
       {teamsState.status === 'failed' && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">
-          Failed to load teams: {teamsState.error}
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-600 flex items-center gap-3">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/70">
+            <AlertIcon className="h-6 w-6" />
+          </span>
+          <span>Failed to load teams: {teamsState.error}</span>
         </div>
       )}
 
       {contributionsState.status === 'loading' && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-500">
-          Loading contributions...
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-slate-600 flex items-center gap-3">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <LoadingIcon className="h-6 w-6 animate-spin" />
+          </span>
+          <span>Loading contributions...</span>
         </div>
       )}
 
       {selectedTeams.length === 0 && teamsState.status === 'succeeded' && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-500">
-          Select at least one team to display contribution data.
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-slate-600 flex items-center gap-3">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <InfoIcon className="h-6 w-6" />
+          </span>
+          <span>Select at least one team to display contribution data.</span>
         </div>
       )}
 
       {contributionsState.status === 'failed' && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">
-          Failed to load contributions: {contributionsState.error}
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-600 flex items-center gap-3">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/70">
+            <AlertIcon className="h-6 w-6" />
+          </span>
+          <span>Failed to load contributions: {contributionsState.error}</span>
         </div>
       )}
 
       {contributionsState.status === 'succeeded' && Object.keys(contributionsByTeam).length === 0 && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-500">
-          No contribution data for the selected filters.
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-slate-600 flex items-center gap-3">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <EmptyStateIcon className="h-6 w-6" />
+          </span>
+          <span>No contribution data for the selected filters.</span>
         </div>
       )}
 

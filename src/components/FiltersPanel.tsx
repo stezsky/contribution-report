@@ -1,4 +1,5 @@
 import React from 'react';
+import { CalendarIcon, UsersIcon } from './icons';
 
 interface FiltersPanelProps {
   months: number;
@@ -38,7 +39,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
   return (
     <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-800">Months range</h2>
+        <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+          <span className="text-primary">
+            <CalendarIcon className="h-5 w-5" />
+          </span>
+          Months range
+        </h2>
         <p className="text-sm text-slate-500 mb-3">
           Select the number of months to include in the report.
         </p>
@@ -76,7 +82,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-slate-800">Teams</h2>
+          <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+            <span className="text-primary">
+              <UsersIcon className="h-5 w-5" />
+            </span>
+            Teams
+          </h2>
           <div className="flex items-center gap-2 text-sm">
             <button
               type="button"

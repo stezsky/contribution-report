@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ContributionReportPage from './pages/ContributionReportPage';
 import ContributionDetailPage from './pages/ContributionDetailPage';
+import { ChartIcon } from './components/icons';
 
 type RouteState =
   | { type: 'report' }
@@ -68,7 +69,12 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-slate-100 pb-16">
       <header className="bg-primary text-white py-6 shadow-md">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-semibold">Contribution Reports</h1>
+          <h1 className="text-3xl font-semibold flex items-center gap-3">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+              <ChartIcon className="h-7 w-7 text-white" />
+            </span>
+            Contribution Reports
+          </h1>
           <p className="text-sm text-slate-200 mt-2">
             Explore contribution metrics by squad, developer, and month.
           </p>
