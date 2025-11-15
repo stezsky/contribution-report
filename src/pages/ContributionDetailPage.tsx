@@ -33,13 +33,12 @@ const formatChange = (added?: number, deleted?: number) => {
   return `+${safeAdded} -${safeDeleted}`;
 };
 
-const abbreviateCommitMessage = (message: string) => {
-  const firstLine = message.split(/\r?\n/)[0] ?? '';
-  if (firstLine.length <= 120) {
-    return firstLine;
+const shortenCommitId = (commitId: string) => {
+  if (!commitId) {
+    return '-';
   }
 
-  return `${firstLine.slice(0, 117)}...`;
+  return commitId.length > 12 ? commitId.slice(0, 12) : commitId;
 };
 
 const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, developer, onBack }) => {
@@ -60,6 +59,7 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
 
   const jiraBaseUrl = appConfig.jiraBaseUrl;
   const gitBaseUrl = appConfig.gitBaseUrl;
+  const gitRepositoryBaseUrl = appConfig.gitRepositoryBaseUrl;
 
   return (
     <section className="space-y-6">
@@ -220,11 +220,37 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                     </tr>
                   )}
                   {detail.commitContributions.map((commit) => {
-                    const commitUrl = gitBaseUrl ? `${gitBaseUrl}${commit.commitId}` : undefined;
+                    const repositoryUrl =
+                      commit.repositoryName && gitRepositoryBaseUrl
+                        ? `${gitRepositoryBaseUrl}${commit.repositoryName}`
+                        : undefined;
+                    const commitUrl =
+                      commit.repositoryName && gitRepositoryBaseUrl
+                        ? `${gitRepositoryBaseUrl}${commit.repositoryName}/commit/${commit.commitId}`
+                        : gitBaseUrl
+                          ? `${gitBaseUrl}${commit.commitId}`
+                          : undefined;
                     const commitJiraUrl = commit.jiraTaskId && jiraBaseUrl ? `${jiraBaseUrl}${commit.jiraTaskId}` : undefined;
                     return (
                       <tr key={commit.commitId} className="border-t border-slate-100">
-                        <td className="py-2 pr-4 whitespace-nowrap">{commit.repositoryName ?? '-'}</td>
+                        <td className="py-2 pr-4 whitespace-nowrap">
+                          {commit.repositoryName ? (
+                            repositoryUrl ? (
+                              <a
+                                href={repositoryUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent hover:text-accent/80"
+                              >
+                                {commit.repositoryName}
+                              </a>
+                            ) : (
+                              commit.repositoryName
+                            )
+                          ) : (
+                            '-'
+                          )}
+                        </td>
                         <td className="py-2 pr-4 font-medium text-slate-700">
                           {commit.jiraTaskId ? (
                             commitJiraUrl ? (
@@ -251,13 +277,13 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                               rel="noreferrer"
                               className="text-accent hover:text-accent/80"
                             >
-                              {commit.commitId}
+                              {shortenCommitId(commit.commitId)}
                             </a>
                           ) : (
-                            commit.commitId
+                            shortenCommitId(commit.commitId)
                           )}
                         </td>
-                        <td className="py-2 pr-4 max-w-md">{abbreviateCommitMessage(commit.commitMessage)}</td>
+                        <td className="py-2 pr-4 max-w-md whitespace-pre-line">{commit.commitMessage}</td>
                         <td className="py-2 pr-4 whitespace-nowrap">{formatDate(commit.commitDate)}</td>
                         <td className="py-2 pr-4">{formatChange(commit.srcAdded, commit.srcDeleted)}</td>
                         <td className="py-2 pr-4">{formatChange(commit.testAdded, commit.testDeleted)}</td>
