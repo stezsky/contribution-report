@@ -21,6 +21,13 @@ import {
   buildStackedBugSeries,
   buildStackedSeries
 } from '../utils/dataTransform';
+import {
+  BugIcon,
+  CalendarIcon,
+  ClipboardIcon,
+  ColumnsIcon,
+  SparkIcon
+} from './icons';
 
 interface TeamReportProps {
   teamName: string;
@@ -115,7 +122,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-semibold text-slate-800">Period totals</h3>
+          <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+            <span className="text-primary">
+              <ClipboardIcon className="h-5 w-5" />
+            </span>
+            Period totals
+          </h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
@@ -144,7 +156,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-3 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800">Story Points share</h3>
+            <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <span className="text-primary">
+                <SparkIcon className="h-5 w-5" />
+              </span>
+              Story Points share
+            </h3>
             <div className="h-64 min-w-0">
               <ResponsiveContainer>
                 <PieChart>
@@ -172,7 +189,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
             </div>
           </div>
           <div className="flex flex-col gap-3 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800">Bug share</h3>
+            <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <span className="text-primary">
+                <BugIcon className="h-5 w-5" />
+              </span>
+              Bug share
+            </h3>
             <div className="h-64 min-w-0">
               <ResponsiveContainer>
                 <PieChart>
@@ -197,7 +219,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
       {developerKeys.length > 0 && (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="h-80 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800 mb-3">Story Points per month</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+              <span className="text-primary">
+                <ColumnsIcon className="h-5 w-5" />
+              </span>
+              Story Points per month
+            </h3>
             <ResponsiveContainer>
               <BarChart data={storySeries}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -216,7 +243,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
             </ResponsiveContainer>
           </div>
           <div className="h-80 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800 mb-3">Bugs fixed per month</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+              <span className="text-primary">
+                <BugIcon className="h-5 w-5" />
+              </span>
+              Bugs fixed per month
+            </h3>
             <ResponsiveContainer>
               <BarChart data={bugSeries}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -238,7 +270,12 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
       )}
 
       <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-slate-800">Monthly breakdown</h3>
+        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+          <span className="text-primary">
+            <CalendarIcon className="h-5 w-5" />
+          </span>
+          Monthly breakdown
+        </h3>
         {monthsDesc.map((month) => {
             const developers = monthDeveloperAggregates[month] ?? [];
             return (
