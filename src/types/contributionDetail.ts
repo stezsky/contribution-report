@@ -32,6 +32,7 @@ export interface ContributionDetailDto {
   developerEmail: string;
   developerName?: string;
   totalStoryPoints: number;
+  totalStories: number;
   totalBugs: number;
   totalCommits: number;
   jiraContributions: JiraContributionDto[];

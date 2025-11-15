@@ -33,6 +33,15 @@ const formatChange = (added?: number, deleted?: number) => {
   return `+${safeAdded} -${safeDeleted}`;
 };
 
+const abbreviateCommitMessage = (message: string) => {
+  const firstLine = message.split(/\r?\n/)[0] ?? '';
+  if (firstLine.length <= 120) {
+    return firstLine;
+  }
+
+  return `${firstLine.slice(0, 117)}...`;
+};
+
 const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, developer, onBack }) => {
   const dispatch = useAppDispatch();
   const { detail, status, error } = useAppSelector((state) => state.contributionDetail);
@@ -86,12 +95,16 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
         <div className="space-y-8">
           <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-slate-800 mb-4">Summary</h3>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="border border-slate-100 rounded-xl p-4">
                 <p className="text-sm text-slate-500">Story points</p>
                 <p className="text-2xl font-semibold text-slate-900">
                   {detail.totalStoryPoints.toFixed(1)}
                 </p>
+              </div>
+              <div className="border border-slate-100 rounded-xl p-4">
+                <p className="text-sm text-slate-500">Stories</p>
+                <p className="text-2xl font-semibold text-slate-900">{detail.totalStories}</p>
               </div>
               <div className="border border-slate-100 rounded-xl p-4">
                 <p className="text-sm text-slate-500">Bugs fixed</p>
@@ -112,21 +125,20 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
               </p>
             </header>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
+              <table className="min-w-full text-xs">
                 <thead>
-                  <tr className="text-left text-slate-500 uppercase text-xs tracking-wide">
+                  <tr className="text-left text-slate-500 uppercase text-[0.65rem] tracking-wide">
                     <th className="py-2 pr-4">Jira task</th>
                     <th className="py-2 pr-4">First commit</th>
                     <th className="py-2 pr-4">Summary</th>
                     <th className="py-2 pr-4">Story points</th>
-                    <th className="py-2 pr-4">Status</th>
                     <th className="py-2 pr-4">Type</th>
                   </tr>
                 </thead>
                 <tbody>
                   {detail.jiraContributions.length === 0 && (
                     <tr>
-                      <td className="py-4 text-center text-slate-500" colSpan={6}>
+                      <td className="py-4 text-center text-slate-500" colSpan={5}>
                         No Jira tasks recorded for this month.
                       </td>
                     </tr>
@@ -150,9 +162,25 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                           )}
                         </td>
                         <td className="py-2 pr-4 whitespace-nowrap">{formatDate(jira.firstCommitDate)}</td>
-                        <td className="py-2 pr-4 max-w-sm">{jira.summary ?? '-'}</td>
+                        <td className="py-2 pr-4 max-w-sm">
+                          {jira.summary ? (
+                            jiraUrl ? (
+                              <a
+                                href={jiraUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent hover:text-accent/80"
+                              >
+                                {jira.summary}
+                              </a>
+                            ) : (
+                              jira.summary
+                            )
+                          ) : (
+                            '-'
+                          )}
+                        </td>
                         <td className="py-2 pr-4">{jira.storyPoints ?? '-'}</td>
-                        <td className="py-2 pr-4">{jira.status ?? '-'}</td>
                         <td className="py-2 pr-4">{jira.type ?? '-'}</td>
                       </tr>
                     );
@@ -170,9 +198,11 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
               </p>
             </header>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
+              <table className="min-w-full text-xs">
                 <thead>
-                  <tr className="text-left text-slate-500 uppercase text-xs tracking-wide">
+                  <tr className="text-left text-slate-500 uppercase text-[0.65rem] tracking-wide">
+                    <th className="py-2 pr-4">Repository</th>
+                    <th className="py-2 pr-4">Jira task</th>
                     <th className="py-2 pr-4">Commit</th>
                     <th className="py-2 pr-4">Message</th>
                     <th className="py-2 pr-4">Date</th>
@@ -184,15 +214,35 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                 <tbody>
                   {detail.commitContributions.length === 0 && (
                     <tr>
-                      <td className="py-4 text-center text-slate-500" colSpan={6}>
+                      <td className="py-4 text-center text-slate-500" colSpan={8}>
                         No commits recorded for this month.
                       </td>
                     </tr>
                   )}
                   {detail.commitContributions.map((commit) => {
                     const commitUrl = gitBaseUrl ? `${gitBaseUrl}${commit.commitId}` : undefined;
+                    const commitJiraUrl = commit.jiraTaskId && jiraBaseUrl ? `${jiraBaseUrl}${commit.jiraTaskId}` : undefined;
                     return (
                       <tr key={commit.commitId} className="border-t border-slate-100">
+                        <td className="py-2 pr-4 whitespace-nowrap">{commit.repositoryName ?? '-'}</td>
+                        <td className="py-2 pr-4 font-medium text-slate-700">
+                          {commit.jiraTaskId ? (
+                            commitJiraUrl ? (
+                              <a
+                                href={commitJiraUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-accent hover:text-accent/80"
+                              >
+                                {commit.jiraTaskId}
+                              </a>
+                            ) : (
+                              commit.jiraTaskId
+                            )
+                          ) : (
+                            '-'
+                          )}
+                        </td>
                         <td className="py-2 pr-4 font-medium text-slate-700 whitespace-nowrap">
                           {commitUrl ? (
                             <a
@@ -207,7 +257,7 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                             commit.commitId
                           )}
                         </td>
-                        <td className="py-2 pr-4 max-w-md">{commit.commitMessage}</td>
+                        <td className="py-2 pr-4 max-w-md">{abbreviateCommitMessage(commit.commitMessage)}</td>
                         <td className="py-2 pr-4 whitespace-nowrap">{formatDate(commit.commitDate)}</td>
                         <td className="py-2 pr-4">{formatChange(commit.srcAdded, commit.srcDeleted)}</td>
                         <td className="py-2 pr-4">{formatChange(commit.testAdded, commit.testDeleted)}</td>
