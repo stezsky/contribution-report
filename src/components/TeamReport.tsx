@@ -83,14 +83,19 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
     [monthDeveloperAggregates]
   );
 
+  const monthsDesc = useMemo(
+    () => monthsAsc.slice().sort((a, b) => b.localeCompare(a)),
+    [monthsAsc]
+  );
+
   const storySeries = useMemo(
-    () => buildStackedSeries(monthsAsc, monthDeveloperAggregates),
-    [monthsAsc, monthDeveloperAggregates]
+    () => buildStackedSeries(monthsDesc, monthDeveloperAggregates),
+    [monthsDesc, monthDeveloperAggregates]
   );
 
   const bugSeries = useMemo(
-    () => buildStackedBugSeries(monthsAsc, monthDeveloperAggregates),
-    [monthsAsc, monthDeveloperAggregates]
+    () => buildStackedBugSeries(monthsDesc, monthDeveloperAggregates),
+    [monthsDesc, monthDeveloperAggregates]
   );
 
   const developerKeys = useMemo(
@@ -233,10 +238,7 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
 
       <div className="space-y-6">
         <h3 className="text-lg font-semibold text-slate-800">Monthly breakdown</h3>
-        {monthsAsc
-          .slice()
-          .sort((a, b) => b.localeCompare(a))
-          .map((month) => {
+        {monthsDesc.map((month) => {
             const developers = monthDeveloperAggregates[month] ?? [];
             return (
               <article key={month} className="border border-slate-100 rounded-xl p-4">
