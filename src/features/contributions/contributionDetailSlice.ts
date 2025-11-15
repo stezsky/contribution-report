@@ -39,8 +39,9 @@ const buildQuery = ({ month, developer }: FetchDetailParams) => {
 const calculateSummary = (
   jira: JiraContributionDto[],
   commits: CommitContributionDto[]
-): Pick<ContributionDetailDto, 'totalStoryPoints' | 'totalBugs' | 'totalCommits'> => ({
+): Pick<ContributionDetailDto, 'totalStoryPoints' | 'totalStories' | 'totalBugs' | 'totalCommits'> => ({
   totalStoryPoints: jira.reduce((total, item) => total + (item.storyPoints ?? 0), 0),
+  totalStories: jira.length,
   totalBugs: jira.filter((item) => isBug(item.type)).length,
   totalCommits: commits.length
 });
@@ -64,6 +65,7 @@ export const fetchContributionDetail = createAsyncThunk<ContributionDetailDto, F
       month,
       developerEmail: developer,
       totalStoryPoints: summary.totalStoryPoints,
+      totalStories: summary.totalStories,
       totalBugs: summary.totalBugs,
       totalCommits: summary.totalCommits,
       jiraContributions,
