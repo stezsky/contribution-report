@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import type { SVGProps } from 'react';
 import {
   ResponsiveContainer,
   PieChart,
@@ -54,8 +55,8 @@ const legendWrapperStyle: React.CSSProperties = {
   fontSize: '10px'
 };
 
-const axisTickStyle: React.CSSProperties = {
-  fontSize: '10px'
+const axisTickStyle: SVGProps<SVGTextElement> = {
+  fontSize: 10
 };
 
 const tooltipContentStyle: React.CSSProperties = {
@@ -261,15 +262,27 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {developers.map((developer) => (
-                          <tr key={developer.email} className="border-t border-slate-100">
-                            <td className="py-2 pr-4 font-medium text-slate-700">{developer.email}</td>
-                            <td className="py-2 pr-4">{developer.plannedStoryPoints.toFixed(1)}</td>
-                            <td className="py-2 pr-4">{developer.storyCount}</td>
-                            <td className="py-2 pr-4">{developer.bugCount}</td>
-                            <td className="py-2 pr-4">{developer.commitsCount}</td>
-                          </tr>
-                        ))}
+                        {developers.map((developer) => {
+                          const detailHash = `#/details/${encodeURIComponent(month)}/${encodeURIComponent(
+                            developer.email
+                          )}`;
+                          return (
+                            <tr key={developer.email} className="border-t border-slate-100">
+                              <td className="py-2 pr-4 font-medium text-slate-700">
+                                <a
+                                  href={detailHash}
+                                  className="text-accent hover:text-accent/80"
+                                >
+                                  {developer.email}
+                                </a>
+                              </td>
+                              <td className="py-2 pr-4">{developer.plannedStoryPoints.toFixed(1)}</td>
+                              <td className="py-2 pr-4">{developer.storyCount}</td>
+                              <td className="py-2 pr-4">{developer.bugCount}</td>
+                              <td className="py-2 pr-4">{developer.commitsCount}</td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
