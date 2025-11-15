@@ -14,7 +14,11 @@ interface ContributionDetailPageProps {
   onBack: () => void;
 }
 
-const formatDate = (value: string) => {
+const formatDate = (value?: string) => {
+  if (!value) {
+    return '-';
+  }
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
@@ -146,10 +150,10 @@ const ContributionDetailPage: React.FC<ContributionDetailPageProps> = ({ month, 
                           )}
                         </td>
                         <td className="py-2 pr-4 whitespace-nowrap">{formatDate(jira.firstCommitDate)}</td>
-                        <td className="py-2 pr-4 max-w-sm">{jira.summary}</td>
-                        <td className="py-2 pr-4">{jira.storyPoints}</td>
-                        <td className="py-2 pr-4">{jira.status}</td>
-                        <td className="py-2 pr-4">{jira.type}</td>
+                        <td className="py-2 pr-4 max-w-sm">{jira.summary ?? '-'}</td>
+                        <td className="py-2 pr-4">{jira.storyPoints ?? '-'}</td>
+                        <td className="py-2 pr-4">{jira.status ?? '-'}</td>
+                        <td className="py-2 pr-4">{jira.type ?? '-'}</td>
                       </tr>
                     );
                   })}

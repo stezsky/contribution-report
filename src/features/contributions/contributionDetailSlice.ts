@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import apiClient from '../../utils/api';
-import type { ContributionDetailDto } from '../../types/contributionDetail';
+import type {
+  CommitContributionDto,
+  ContributionDetailDto,
+  JiraContributionDto
+} from '../../types/contributionDetail';
 
 interface FetchDetailParams {
   month: string;
@@ -18,16 +22,53 @@ const initialState: ContributionDetailState = {
   status: 'idle'
 };
 
+const isBug = (type?: string) => type?.toLowerCase() === 'bug';
+
+const buildQuery = ({ month, developer }: FetchDetailParams) => {
+  const searchParams = new URLSearchParams();
+  if (developer) {
+    searchParams.set('email', developer);
+  }
+  if (month) {
+    searchParams.set('month', month);
+  }
+
+  return searchParams.toString();
+};
+
+const calculateSummary = (
+  jira: JiraContributionDto[],
+  commits: CommitContributionDto[]
+): Pick<ContributionDetailDto, 'totalStoryPoints' | 'totalBugs' | 'totalCommits'> => ({
+  totalStoryPoints: jira.reduce((total, item) => total + (item.storyPoints ?? 0), 0),
+  totalBugs: jira.filter((item) => isBug(item.type)).length,
+  totalCommits: commits.length
+});
+
 export const fetchContributionDetail = createAsyncThunk<ContributionDetailDto, FetchDetailParams>(
   'contributionDetail/fetch',
   async ({ month, developer }) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set('month', month);
-    searchParams.set('developer', developer);
-    const query = searchParams.toString();
-    const endpoint = query.length > 0 ? `/contribution/detail?${query}` : '/contribution/detail';
-    const response = await apiClient.get<ContributionDetailDto>(endpoint);
-    return response.data;
+    const query = buildQuery({ month, developer });
+    const endpointSuffix = query.length > 0 ? `?${query}` : '';
+
+    const [jiraResponse, commitResponse] = await Promise.all([
+      apiClient.get<JiraContributionDto[]>(`/contribution/jira${endpointSuffix}`),
+      apiClient.get<CommitContributionDto[]>(`/contribution/commit${endpointSuffix}`)
+    ]);
+
+    const jiraContributions = jiraResponse.data ?? [];
+    const commitContributions = commitResponse.data ?? [];
+    const summary = calculateSummary(jiraContributions, commitContributions);
+
+    return {
+      month,
+      developerEmail: developer,
+      totalStoryPoints: summary.totalStoryPoints,
+      totalBugs: summary.totalBugs,
+      totalCommits: summary.totalCommits,
+      jiraContributions,
+      commitContributions
+    } satisfies ContributionDetailDto;
   }
 );
 

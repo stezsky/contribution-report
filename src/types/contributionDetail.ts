@@ -1,10 +1,13 @@
 export interface JiraContributionDto {
   jiraTaskId: string;
-  firstCommitDate: string;
-  summary: string;
-  storyPoints: number;
-  status: string;
-  type: string;
+  author?: string;
+  teamName?: string;
+  contribution?: number;
+  firstCommitDate?: string;
+  summary?: string;
+  storyPoints?: number;
+  status?: string;
+  type?: string;
 }
 
 export interface CommitContributionDto {
@@ -13,6 +16,9 @@ export interface CommitContributionDto {
   commitDate: string;
   repositoryName?: string;
   jiraTaskId?: string;
+  author?: string;
+  teamName?: string;
+  diff?: string;
   srcAdded: number;
   srcDeleted: number;
   testAdded: number;
