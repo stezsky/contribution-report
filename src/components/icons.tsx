@@ -72,6 +72,15 @@ export const EmptyStateIcon: React.FC<IconProps> = ({ title = 'Empty state icon'
   </svg>
 );
 
+export const NoDataIcon: React.FC<IconProps> = ({ title = 'No data icon', ...props }) => (
+  <svg viewBox="0 0 24 24" {...baseIconProps} {...props}>
+    {title ? <title>{title}</title> : null}
+    <circle cx="12" cy="12" r="8" />
+    <path d="m8.5 8.5 7 7" />
+    <path d="m15.5 8.5-7 7" />
+  </svg>
+);
+
 export const SparkIcon: React.FC<IconProps> = ({ title = 'Performance icon', ...props }) => (
   <svg viewBox="0 0 24 24" {...baseIconProps} {...props}>
     {title ? <title>{title}</title> : null}

@@ -28,6 +28,7 @@ import {
   ColumnsIcon,
   SparkIcon
 } from './icons';
+import ChartPlaceholder from './ChartPlaceholder';
 
 interface TeamReportProps {
   teamName: string;
@@ -59,7 +60,8 @@ const formatLegendLabel = (value: string | number) => {
 };
 
 const legendWrapperStyle: React.CSSProperties = {
-  fontSize: '10px'
+  fontSize: '10px',
+  marginBottom: '16px'
 };
 
 const axisTickStyle: SVGProps<SVGTextElement> = {
@@ -77,6 +79,22 @@ const tooltipItemStyle: React.CSSProperties = {
 const tooltipLabelStyle: React.CSSProperties = {
   fontSize: '11px'
 };
+
+const hasStackedSeriesValues = (
+  series: Array<Record<string, string | number>>,
+  keys: string[]
+) => {
+  if (series.length === 0 || keys.length === 0) {
+    return false;
+  }
+
+  return series.some((entry) => keys.some((key) => Number(entry[key] ?? 0) > 0));
+};
+
+const hasDeveloperMetric = (
+  developers: Array<{ plannedStoryPoints: number; bugCount: number }>,
+  key: 'plannedStoryPoints' | 'bugCount'
+) => developers.some((developer) => developer[key] > 0);
 
 const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
   const developerTotals = useMemo(() => aggregateByDeveloper(contributions), [contributions]);
@@ -110,6 +128,11 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
     () => developerTotals.map((developer) => developer.email),
     [developerTotals]
   );
+
+  const hasStoryShareData = hasDeveloperMetric(developerTotals, 'plannedStoryPoints');
+  const hasBugShareData = hasDeveloperMetric(developerTotals, 'bugCount');
+  const hasStoryStackedData = hasStackedSeriesValues(storySeries, developerKeys);
+  const hasBugStackedData = hasStackedSeriesValues(bugSeries, developerKeys);
 
   return (
     <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-8">
@@ -163,29 +186,33 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
               Story Points share
             </h3>
             <div className="h-64 min-w-0">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie
-                    data={developerTotals}
-                    dataKey="plannedStoryPoints"
-                    nameKey="email"
-                    outerRadius={90}
-                    innerRadius={50}
-                    paddingAngle={2}
-                  >
-                    {developerTotals.map((entry, index) => (
-                      <Cell key={entry.email} fill={getColor(index)} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => value.toFixed(1)}
-                    contentStyle={tooltipContentStyle}
-                    itemStyle={tooltipItemStyle}
-                    labelStyle={tooltipLabelStyle}
-                  />
-                  <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
-                </PieChart>
-              </ResponsiveContainer>
+              {hasStoryShareData ? (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={developerTotals}
+                      dataKey="plannedStoryPoints"
+                      nameKey="email"
+                      outerRadius={90}
+                      innerRadius={50}
+                      paddingAngle={2}
+                    >
+                      {developerTotals.map((entry, index) => (
+                        <Cell key={entry.email} fill={getColor(index)} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => value.toFixed(1)}
+                      contentStyle={tooltipContentStyle}
+                      itemStyle={tooltipItemStyle}
+                      labelStyle={tooltipLabelStyle}
+                    />
+                    <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <ChartPlaceholder message="No story points data" />
+              )}
             </div>
           </div>
           <div className="flex flex-col gap-3 min-w-0">
@@ -196,35 +223,39 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
               Bug share
             </h3>
             <div className="h-64 min-w-0">
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={developerTotals} dataKey="bugCount" nameKey="email" outerRadius={90} innerRadius={50}>
-                    {developerTotals.map((entry, index) => (
-                      <Cell key={entry.email} fill={getColor(index)} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={tooltipContentStyle}
-                    itemStyle={tooltipItemStyle}
-                    labelStyle={tooltipLabelStyle}
-                  />
-                  <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
-                </PieChart>
-              </ResponsiveContainer>
+              {hasBugShareData ? (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={developerTotals} dataKey="bugCount" nameKey="email" outerRadius={90} innerRadius={50}>
+                      {developerTotals.map((entry, index) => (
+                        <Cell key={entry.email} fill={getColor(index)} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={tooltipContentStyle}
+                      itemStyle={tooltipItemStyle}
+                      labelStyle={tooltipLabelStyle}
+                    />
+                    <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <ChartPlaceholder message="No bug data" />
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {developerKeys.length > 0 && (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="h-80 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
-              <span className="text-primary">
-                <ColumnsIcon className="h-5 w-5" />
-              </span>
-              Story Points per month
-            </h3>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="h-80 min-w-0">
+          <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <span className="text-primary">
+              <ColumnsIcon className="h-5 w-5" />
+            </span>
+            Story Points per month
+          </h3>
+          {hasStoryStackedData ? (
             <ResponsiveContainer>
               <BarChart data={storySeries}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -241,14 +272,18 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                 ))}
               </BarChart>
             </ResponsiveContainer>
-          </div>
-          <div className="h-80 min-w-0">
-            <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
-              <span className="text-primary">
-                <BugIcon className="h-5 w-5" />
-              </span>
-              Bugs fixed per month
-            </h3>
+          ) : (
+            <ChartPlaceholder message="No story history" />
+          )}
+        </div>
+        <div className="h-80 min-w-0">
+          <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2">
+            <span className="text-primary">
+              <BugIcon className="h-5 w-5" />
+            </span>
+            Bugs fixed per month
+          </h3>
+          {hasBugStackedData ? (
             <ResponsiveContainer>
               <BarChart data={bugSeries}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -265,9 +300,11 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                 ))}
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          ) : (
+            <ChartPlaceholder message="No bug history" />
+          )}
         </div>
-      )}
+      </div>
 
       <div className="space-y-6">
         <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
@@ -326,43 +363,51 @@ const TeamReport: React.FC<TeamReportProps> = ({ teamName, contributions }) => {
                   <div className="grid grid-cols-1 gap-4">
                     <div className="h-64 min-w-0">
                       <h5 className="text-sm font-semibold text-slate-700 mb-2">Story Points share</h5>
-                      <ResponsiveContainer>
-                        <PieChart>
-                          <Pie data={developers} dataKey="plannedStoryPoints" nameKey="email" outerRadius={80}>
-                            {developers.map((entry, index) => (
-                              <Cell key={entry.email} fill={getColor(index)} />
-                            ))}
-                          </Pie>
-                          <Tooltip
-                            formatter={(value: number) => value.toFixed(1)}
-                            contentStyle={tooltipContentStyle}
-                            itemStyle={tooltipItemStyle}
-                            labelStyle={tooltipLabelStyle}
-                          />
-                          <Legend
-                            formatter={(value) => formatLegendLabel(value)}
-                            wrapperStyle={legendWrapperStyle}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
+                      {hasDeveloperMetric(developers, 'plannedStoryPoints') ? (
+                        <ResponsiveContainer>
+                          <PieChart>
+                            <Pie data={developers} dataKey="plannedStoryPoints" nameKey="email" outerRadius={80}>
+                              {developers.map((entry, index) => (
+                                <Cell key={entry.email} fill={getColor(index)} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              formatter={(value: number) => value.toFixed(1)}
+                              contentStyle={tooltipContentStyle}
+                              itemStyle={tooltipItemStyle}
+                              labelStyle={tooltipLabelStyle}
+                            />
+                            <Legend
+                              formatter={(value) => formatLegendLabel(value)}
+                              wrapperStyle={legendWrapperStyle}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <ChartPlaceholder message="No story data" />
+                      )}
                     </div>
                     <div className="h-64 min-w-0">
                       <h5 className="text-sm font-semibold text-slate-700 mb-2">Bug share</h5>
-                      <ResponsiveContainer>
-                        <PieChart>
-                          <Pie data={developers} dataKey="bugCount" nameKey="email" outerRadius={80}>
-                            {developers.map((entry, index) => (
-                              <Cell key={entry.email} fill={getColor(index)} />
-                            ))}
-                          </Pie>
-                          <Tooltip
-                            contentStyle={tooltipContentStyle}
-                            itemStyle={tooltipItemStyle}
-                            labelStyle={tooltipLabelStyle}
-                          />
-                          <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
-                        </PieChart>
-                      </ResponsiveContainer>
+                      {hasDeveloperMetric(developers, 'bugCount') ? (
+                        <ResponsiveContainer>
+                          <PieChart>
+                            <Pie data={developers} dataKey="bugCount" nameKey="email" outerRadius={80}>
+                              {developers.map((entry, index) => (
+                                <Cell key={entry.email} fill={getColor(index)} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              contentStyle={tooltipContentStyle}
+                              itemStyle={tooltipItemStyle}
+                              labelStyle={tooltipLabelStyle}
+                            />
+                            <Legend formatter={(value) => formatLegendLabel(value)} wrapperStyle={legendWrapperStyle} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <ChartPlaceholder message="No bug data" />
+                      )}
                     </div>
                   </div>
                 </div>

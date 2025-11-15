@@ -22,14 +22,10 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
 
   const handleTeamToggle = (team: string) => {
     if (selectedTeams.includes(team)) {
-      onTeamsChange(selectedTeams.filter((item) => item !== team));
+      onTeamsChange([]);
     } else {
-      onTeamsChange([...selectedTeams, team]);
+      onTeamsChange([team]);
     }
-  };
-
-  const handleSelectAll = () => {
-    onTeamsChange([...teamList]);
   };
 
   const handleClearSelection = () => {
@@ -89,14 +85,6 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
             Teams
           </h2>
           <div className="flex items-center gap-2 text-sm">
-            <button
-              type="button"
-              onClick={handleSelectAll}
-              className="text-accent hover:underline"
-              disabled={teamList.length === 0}
-            >
-              Select all
-            </button>
             <button type="button" onClick={handleClearSelection} className="text-slate-500 hover:underline">
               Clear
             </button>
@@ -113,7 +101,8 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({
                 }`}
               >
                 <input
-                  type="checkbox"
+                  type="radio"
+                  name="team-selection"
                   className="h-4 w-4"
                   checked={isSelected}
                   onChange={() => handleTeamToggle(team)}
